@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <color name="background">#16191E</color>
+    <color name="surface">#22272E</color>
+    <color name="surface_border">#46515E</color>
+
+    <color name="text_primary">#F2F4F7</color>
+    <color name="text_secondary">#AAB4C0</color>
+
+    <color name="status_waiting">#F2B84B</color>
+    <color name="status_connected">#58C878</color>
+    <color name="status_error">#E06666</color>
+
+    <color name="touch_indicator">#668FAFCF</color>
+</resources>

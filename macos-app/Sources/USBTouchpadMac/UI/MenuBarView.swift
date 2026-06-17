@@ -28,7 +28,7 @@ struct MenuBarView: View {
       footer
     }
     .padding(16)
-    .frame(width: 340)
+    .frame(width: 360)
     .task {
       appState.start()
     }
@@ -38,8 +38,8 @@ struct MenuBarView: View {
     HStack(spacing: 10) {
       Image(
         systemName: appState.isConnected
-          ? "rectangle.connected.to.line.below"
-          : "rectangle.dashed"
+          ? "wifi"
+          : "wifi.slash"
       )
       .font(.title2)
       .foregroundStyle(
@@ -48,7 +48,10 @@ struct MenuBarView: View {
           : Color.secondary
       )
 
-      VStack(alignment: .leading, spacing: 2) {
+      VStack(
+        alignment: .leading,
+        spacing: 2
+      ) {
         Text("USB Touchpad")
           .font(.headline)
 
@@ -63,7 +66,33 @@ struct MenuBarView: View {
   }
 
   private var connectionSection: some View {
-    VStack(alignment: .leading, spacing: 8) {
+    VStack(
+      alignment: .leading,
+      spacing: 10
+    ) {
+      Text("Tablet connection")
+        .font(.subheadline)
+        .fontWeight(.semibold)
+
+      HStack {
+        Text("IP address")
+
+        TextField(
+          "192.168.43.1",
+          text: $appState.tabletHost
+        )
+        .textFieldStyle(.roundedBorder)
+        .frame(width: 160)
+        .onSubmit {
+          appState.reconnect()
+        }
+      }
+
+      row(
+        title: "Port",
+        value: "27183"
+      )
+
       row(
         title: "Device",
         value: appState.deviceName
@@ -102,12 +131,18 @@ struct MenuBarView: View {
   }
 
   private var settingsSection: some View {
-    VStack(alignment: .leading, spacing: 12) {
+    VStack(
+      alignment: .leading,
+      spacing: 12
+    ) {
       Text("Pointer")
         .font(.subheadline)
         .fontWeight(.semibold)
 
-      VStack(alignment: .leading, spacing: 4) {
+      VStack(
+        alignment: .leading,
+        spacing: 4
+      ) {
         HStack {
           Text("Sensitivity")
 
@@ -130,7 +165,10 @@ struct MenuBarView: View {
         )
       }
 
-      VStack(alignment: .leading, spacing: 4) {
+      VStack(
+        alignment: .leading,
+        spacing: 4
+      ) {
         HStack {
           Text("Scroll sensitivity")
 
@@ -161,10 +199,14 @@ struct MenuBarView: View {
   }
 
   private var accessibilitySection: some View {
-    VStack(alignment: .leading, spacing: 8) {
+    VStack(
+      alignment: .leading,
+      spacing: 8
+    ) {
       HStack {
         Image(
-          systemName: appState.accessibilityGranted
+          systemName:
+            appState.accessibilityGranted
             ? "checkmark.shield.fill"
             : "exclamationmark.triangle.fill"
         )
@@ -208,12 +250,8 @@ struct MenuBarView: View {
 
   private var footer: some View {
     HStack {
-      Button("Refresh") {
-        appState.refreshAccessibilityStatus()
-
-        if appState.isRunning {
-          appState.reconnect()
-        }
+      Button("Reconnect") {
+        appState.reconnect()
       }
 
       Spacer()
@@ -230,7 +268,9 @@ struct MenuBarView: View {
     title: String,
     value: String
   ) -> some View {
-    HStack(alignment: .firstTextBaseline) {
+    HStack(
+      alignment: .firstTextBaseline
+    ) {
       Text(title)
         .foregroundStyle(.secondary)
 
@@ -247,8 +287,7 @@ struct MenuBarView: View {
   private func openAccessibilitySettings() {
     guard
       let url = URL(
-        string:
-          "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
+        string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
       )
     else {
       return

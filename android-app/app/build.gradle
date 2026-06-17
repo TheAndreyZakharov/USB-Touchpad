@@ -1,0 +1,63 @@
+plugins {
+    id "com.android.application"
+}
+
+android {
+    namespace "com.theandreyzakharov.usbtouchpad"
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.theandreyzakharov.usbtouchpad"
+
+        minSdk 14
+        targetSdk 28
+
+        versionCode 1
+        versionName "0.1.0"
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+
+            minifyEnabled false
+            debuggable true
+        }
+
+        release {
+            minifyEnabled false
+
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    lint {
+        abortOnError true
+        checkReleaseBuilds true
+        warningsAsErrors false
+    }
+
+    packaging {
+        resources {
+            excludes += [
+                "META-INF/DEPENDENCIES",
+                "META-INF/LICENSE",
+                "META-INF/LICENSE.txt",
+                "META-INF/NOTICE",
+                "META-INF/NOTICE.txt"
+            ]
+        }
+    }
+}
+
+dependencies {
+}

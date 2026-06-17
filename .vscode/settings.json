@@ -3,6 +3,7 @@
     "**/.DS_Store": true,
     "android-app/.gradle": true,
     "android-app/**/build": true,
+    "android-app/.vscode-java-output": true,
     "macos-app/.build": true,
     "macos-app/.swiftpm": true
   },
@@ -11,24 +12,38 @@
     "**/.git/subtree-cache/**": true,
     "android-app/.gradle/**": true,
     "android-app/**/build/**": true,
+    "android-app/.vscode-java-output/**": true,
     "macos-app/.build/**": true
   },
   "search.exclude": {
     "android-app/.gradle": true,
     "android-app/**/build": true,
+    "android-app/.vscode-java-output": true,
     "macos-app/.build": true,
     "macos-app/.swiftpm": true
   },
-  "java.configuration.updateBuildConfiguration": "automatic",
+
+  "java.server.launchMode": "LightWeight",
+  "java.import.gradle.enabled": false,
+  "java.configuration.updateBuildConfiguration": "disabled",
+  "java.autobuild.enabled": false,
   "java.compile.nullAnalysis.mode": "automatic",
-  "gradle.nestedProjects": true,
+
+  "java.project.sourcePaths": [
+    "android-app/app/src/main/java"
+  ],
+  "java.project.outputPath": "android-app/.vscode-java-output",
+
+  "gradle.autoDetect": "off",
+
   "swift.path": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin",
+  "swift.swiftEnvironmentVariables": {
+    "DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer"
+  },
+
   "editor.formatOnSave": true,
   "editor.insertSpaces": true,
   "editor.tabSize": 4,
   "files.trimTrailingWhitespace": true,
-  "files.insertFinalNewline": true,
-  "swift.swiftEnvironmentVariables": {
-    "DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer"
-  }
+  "files.insertFinalNewline": true
 }

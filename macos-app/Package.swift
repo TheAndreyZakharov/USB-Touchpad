@@ -16,7 +16,10 @@ let package = Package(
   targets: [
     .executableTarget(
       name: "USBTouchpadMac",
-      path: "Sources/USBTouchpadMac"
+      path: "Sources/USBTouchpadMac",
+      resources: [
+        .process("Resources")
+      ]
     ),
     .testTarget(
       name: "USBTouchpadMacTests",

@@ -1,149 +1,250 @@
 # USB Touchpad
 
-USB Touchpad turns an old Android tablet into a wired touchpad for macOS.
+USB Touchpad turns an old Android tablet into a touchpad for macOS.
 
-The project consists of two applications stored in one repository:
+The project contains two applications:
 
-- an Android application that captures touch input;
-- a macOS application that receives touch events and controls the cursor.
+- an Android application that captures touch gestures and sends input events;
+- a macOS menu bar application that receives those events and controls the cursor.
 
-The Android tablet connects to the Mac through USB. Android Debug Bridge provides the transport channel, so Wi-Fi and Bluetooth are not required.
+The applications communicate directly over a local Wi-Fi network. Internet access is not required.
 
-## Target devices
+## How it works
 
-Development environment:
+The Android tablet creates a Wi-Fi hotspot.
 
-- MacBook Air with Apple Silicon;
-- macOS;
-- 3Q Surf RC9716B-DG tablet;
-- Android 4.x;
-- USB debugging enabled.
+The Mac connects to that hotspot and establishes a direct TCP connection to the Android application.
+
+The Android application starts a TCP server on port `27183`. The macOS application connects to the tablet using its local network address.
+
+Communication flow:
+
+    Touch input on Android
+            ↓
+    Gesture processing
+            ↓
+    TCP server on the tablet
+            ↓
+    Local Wi-Fi connection
+            ↓
+    TCP client on macOS
+            ↓
+    Core Graphics input events
+            ↓
+    Cursor movement, clicks, and scrolling
+
+ADB is not used for the active touchpad connection. It is only used during development to install updated APK files on the tablet.
+
+## Features
+
+### Android application
+
+- one-finger cursor movement;
+- single tap for left click;
+- two-finger tap for right click;
+- two-finger scrolling;
+- automatic screen rotation;
+- connection status display;
+- TCP server for sending touch events;
+- compatibility with Android 4.0.4;
+- custom application icon.
+
+### macOS application
+
+- menu bar interface;
+- direct TCP connection to the tablet;
+- configurable tablet address;
+- automatic reconnection;
+- cursor movement;
+- left and right clicks;
+- scrolling;
+- pointer sensitivity setting;
+- scroll sensitivity setting;
+- natural scrolling option;
+- connection and device information;
+- Accessibility permission handling;
+- custom application icon.
+
+## Network connection
+
+On the Android tablet:
+
+1. Enable the Wi-Fi hotspot.
+2. Open the USB Touchpad application.
+3. Leave the application running.
+
+On the Mac:
+
+1. Connect to the hotspot created by the tablet.
+2. Determine the local address of the tablet.
+3. Enter that address in the macOS application.
+4. Connect to TCP port `27183`.
+
+The tablet address depends on the Android firmware and hotspot configuration. It is commonly the network gateway assigned to the Mac.
+
+Internet access is not required. The Mac and tablet only need to be connected to the same local network.
+
+## Gestures
+
+    One-finger movement  → Move cursor
+    One-finger tap       → Left click
+    Two-finger tap       → Right click
+    Two-finger movement  → Scroll
+
+## Communication protocol
+
+Messages are sent as UTF-8 JSON objects separated by newline characters.
+
+Supported message types include:
+
+- `hello`;
+- `ready`;
+- `move`;
+- `tap`;
+- `rightTap`;
+- `scroll`;
+- `dragStart`;
+- `dragMove`;
+- `dragEnd`;
+- `ping`;
+- `pong`;
+- `error`.
+
+Example movement message:
+
+    {
+      "version": 1,
+      "type": "move",
+      "sequence": 12,
+      "timestamp": 15420,
+      "dx": 7.5,
+      "dy": -2.0
+    }
+
+The complete protocol description is stored in:
+
+    protocol/protocol.md
 
 ## Repository structure
 
     USB-Touchpad/
     ├── android-app/
-    │   └── Android touch input application
+    │   └── Android touch input application and TCP server
     ├── macos-app/
-    │   └── macOS cursor control application
+    │   └── macOS menu bar client and cursor controller
+    ├── assets/
+    │   └── Shared application artwork
     ├── protocol/
     │   └── Communication protocol specification
     ├── docs/
     │   └── Architecture and development documentation
     ├── scripts/
-    │   └── Build, installation, and environment scripts
+    │   └── Development and build scripts
     └── .vscode/
         └── VS Code workspace configuration
 
-## Planned features
+## Android application
 
-Initial version:
+The Android application is written in Java.
 
-1. Move the cursor with one finger.
-2. Perform a left click with a short tap.
-3. Scroll vertically with two fingers.
-4. Connect through USB using ADB port forwarding.
-5. Automatically reconnect after the tablet is disconnected.
-6. Adjust pointer sensitivity on the Mac.
+It uses:
 
-Possible future features:
+- Android `MotionEvent` for touch input;
+- a custom `View` as the touch surface;
+- `ServerSocket` for network communication;
+- JSON messages for input events;
+- Android API 14 as the minimum supported API level.
 
-- right click with a two-finger tap;
-- double click;
-- drag and drop;
-- horizontal scrolling;
-- inertial scrolling;
-- three-finger gestures;
-- automatic Android application launch;
-- macOS menu bar application;
-- remote display mode.
+The project avoids AndroidX, Jetpack Compose and modern Android-only APIs to remain compatible with Android 4.0.4.
 
-## Communication flow
+## macOS application
 
-    Android touch events
-            ↓
-    Android TCP server
-            ↓
-    ADB USB port forwarding
-            ↓
-    macOS TCP client
-            ↓
-    macOS Core Graphics events
-            ↓
-    Cursor, clicks, and scrolling
+The macOS application is written in Swift.
 
-## Development tools
+It uses:
 
-Android application:
+- SwiftUI for the menu bar interface;
+- Network framework for the TCP connection;
+- Core Graphics `CGEvent` for cursor and mouse events;
+- Swift Package Manager for building and testing;
+- `UserDefaults` for storing settings.
 
-- Java;
-- Android SDK;
-- Gradle;
-- minimum Android API compatible with the tablet.
+The application requires Accessibility permission to control the cursor.
 
-macOS application:
-
-- Swift;
-- Swift Package Manager;
-- SwiftUI or AppKit;
-- Core Graphics;
-- Network framework.
-
-Common tools:
-
-- Visual Studio Code;
-- Git;
-- ADB;
-- Xcode toolchain.
-
-## Environment check
-
-From the repository root, run:
-
-    ./scripts/check-environment.sh
-
-The script checks the required development tools and lists connected Android devices.
-
-## Build Android application
-
-From the repository root:
-
-    cd android-app
-    ./gradlew assembleDebug
-
-The generated APK will be located under:
-
-    android-app/app/build/outputs/apk/debug/
-
-## Install Android application
-
-Connect the tablet through USB and run:
-
-    ./scripts/install-android.sh
-
-## Build and run macOS application
-
-From the repository root:
-
-    ./scripts/run-macos.sh
-
-The macOS application will require Accessibility permission before it can control the cursor.
-
-The permission is located in:
+The permission can be enabled in:
 
     System Settings
     Privacy & Security
     Accessibility
 
-## Current development status
+## Development requirements
 
-- repository initialized;
-- Android SDK installed;
-- Gradle wrapper configured;
-- ADB connection with the tablet verified;
-- Swift toolchain installed;
-- Xcode installed;
-- VS Code extensions installed;
-- application source structure created.
+Required tools:
 
-The next development stage is implementing the macOS application.
+- Visual Studio Code;
+- Git;
+- Xcode;
+- Swift;
+- Java 17;
+- Android SDK;
+- Android SDK Platform Tools;
+- Gradle;
+- ADB.
+
+Check the development environment:
+
+    ./scripts/check-environment.sh
+
+## Build the Android application
+
+From the repository root:
+
+    cd android-app
+    ./gradlew clean assembleDebug
+
+The generated APK is located at:
+
+    android-app/app/build/outputs/apk/debug/app-debug.apk
+
+## Install the Android application
+
+Connect the tablet through USB and enable USB debugging.
+
+Check the connection:
+
+    ADB_LIBUSB=0 adb devices -l
+
+Install or update the APK:
+
+    ADB_LIBUSB=0 adb install -r app/build/outputs/apk/debug/app-debug.apk
+
+ADB is only needed for installation and debugging. The running application communicates with the Mac over Wi-Fi.
+
+## Build the macOS application
+
+From the repository root:
+
+    cd macos-app
+    swift build
+
+Run tests:
+
+    swift test
+
+Run the application:
+
+    swift run USBTouchpadMac
+
+The helper script can also be used from the repository root:
+
+    ./scripts/run-macos.sh
+
+## Application icons
+
+The shared source image is stored at:
+
+    assets/app-icon.png
+
+Android uses density-specific launcher icons generated from the shared source image.
+
+The macOS application includes the image as a Swift Package resource.

@@ -11,6 +11,15 @@ final class AppState: ObservableObject {
   @Published private(set) var lastEventText = "No events"
   @Published private(set) var deviceName = "Unknown device"
 
+  @Published var tabletHost: String {
+    didSet {
+      UserDefaults.standard.set(
+        tabletHost,
+        forKey: "tabletHost"
+      )
+    }
+  }
+
   @Published var sensitivity: Double = 1.5 {
     didSet {
       mouseController.sensitivity = sensitivity
@@ -29,7 +38,6 @@ final class AppState: ObservableObject {
     }
   }
 
-  private let adbController = ADBController()
   private let mouseController = MouseController()
 
   private var touchConnection: TouchConnection?
@@ -37,6 +45,11 @@ final class AppState: ObservableObject {
   private var reconnectTask: Task<Void, Never>?
 
   init() {
+    tabletHost =
+      UserDefaults.standard.string(
+        forKey: "tabletHost"
+      ) ?? "192.168.43.1"
+
     mouseController.sensitivity = sensitivity
     mouseController.scrollSensitivity = scrollSensitivity
     mouseController.naturalScrolling = naturalScrolling
@@ -52,7 +65,10 @@ final class AppState: ObservableObject {
     isRunning = true
     statusText = "Starting"
 
-    refreshAccessibilityStatus(promptIfNeeded: true)
+    refreshAccessibilityStatus(
+      promptIfNeeded: true
+    )
+
     connect()
   }
 
@@ -92,19 +108,25 @@ final class AppState: ObservableObject {
   }
 
   func requestAccessibilityPermission() {
-    refreshAccessibilityStatus(promptIfNeeded: true)
+    refreshAccessibilityStatus(
+      promptIfNeeded: true
+    )
   }
 
-  func refreshAccessibilityStatus(promptIfNeeded: Bool = false) {
+  func refreshAccessibilityStatus(
+    promptIfNeeded: Bool = false
+  ) {
     if promptIfNeeded {
       let options =
         [
           "AXTrustedCheckOptionPrompt": true
         ] as CFDictionary
 
-      accessibilityGranted = AXIsProcessTrustedWithOptions(options)
+      accessibilityGranted =
+        AXIsProcessTrustedWithOptions(options)
     } else {
-      accessibilityGranted = AXIsProcessTrusted()
+      accessibilityGranted =
+        AXIsProcessTrusted()
     }
   }
 
@@ -125,47 +147,37 @@ final class AppState: ObservableObject {
       return
     }
 
-    statusText = "Checking Android device"
+    let host = tabletHost.trimmingCharacters(
+      in: .whitespacesAndNewlines
+    )
 
-    do {
-      let detectedDevice = try await adbController.detectDevice()
-      deviceName = detectedDevice
-
-      statusText = "Configuring USB connection"
-
-      try await adbController.configurePortForwarding(
-        localPort: 27183,
-        remotePort: 27183
-      )
-
-      guard isRunning else {
-        return
-      }
-
-      statusText = "Connecting to tablet"
-
-      let connection = TouchConnection(
-        host: "127.0.0.1",
-        port: 27183,
-        onStateChange: { [weak self] state in
-          Task { @MainActor in
-            self?.handleConnectionState(state)
-          }
-        },
-        onMessage: { [weak self] message in
-          Task { @MainActor in
-            self?.handleMessage(message)
-          }
-        }
-      )
-
-      touchConnection = connection
-      connection.start()
-    } catch {
+    guard !host.isEmpty else {
       isConnected = false
-      statusText = "Connection error: \(error.localizedDescription)"
-      scheduleReconnect()
+      statusText = "Tablet IP is empty"
+      return
     }
+
+    statusText = "Connecting to \(host)"
+
+    touchConnection?.stop()
+
+    let connection = TouchConnection(
+      host: host,
+      port: 27183,
+      onStateChange: { [weak self] state in
+        Task { @MainActor in
+          self?.handleConnectionState(state)
+        }
+      },
+      onMessage: { [weak self] message in
+        Task { @MainActor in
+          self?.handleMessage(message)
+        }
+      }
+    )
+
+    touchConnection = connection
+    connection.start()
   }
 
   private func handleConnectionState(
@@ -190,6 +202,7 @@ final class AppState: ObservableObject {
     case .failed(let message):
       isConnected = false
       statusText = "Connection failed: \(message)"
+
       mouseController.releaseAllButtons()
       scheduleReconnect()
 
@@ -198,6 +211,7 @@ final class AppState: ObservableObject {
 
       if isRunning {
         statusText = "Disconnected"
+
         mouseController.releaseAllButtons()
         scheduleReconnect()
       }
@@ -213,7 +227,9 @@ final class AppState: ObservableObject {
 
     reconnectTask = Task { [weak self] in
       do {
-        try await Task.sleep(for: .seconds(2))
+        try await Task.sleep(
+          for: .seconds(2)
+        )
       } catch {
         return
       }
@@ -226,7 +242,9 @@ final class AppState: ObservableObject {
     }
   }
 
-  private func handleMessage(_ message: TouchMessage) {
+  private func handleMessage(
+    _ message: TouchMessage
+  ) {
     lastEventText = message.debugDescription
 
     switch message.type {
@@ -283,7 +301,9 @@ final class AppState: ObservableObject {
       break
 
     case .error:
-      statusText = message.message ?? "Android application error"
+      statusText =
+        message.message
+        ?? "Android application error"
 
     case .unknown:
       break
