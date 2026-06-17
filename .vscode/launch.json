@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:USB-Touchpad}/macos-app",
+            "name": "Debug USBTouchpadMac (macos-app)",
+            "target": "USBTouchpadMac",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug USBTouchpadMac (macos-app)"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:USB-Touchpad}/macos-app",
+            "name": "Release USBTouchpadMac (macos-app)",
+            "target": "USBTouchpadMac",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release USBTouchpadMac (macos-app)"
+        }
+    ]
+}
