@@ -18,3 +18,5 @@ xcuserdata/
 # macOS
 .DS_Store
 
+# Local release artifacts
+release/
