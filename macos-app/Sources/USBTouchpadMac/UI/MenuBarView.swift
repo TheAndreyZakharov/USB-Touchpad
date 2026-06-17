@@ -52,7 +52,7 @@ struct MenuBarView: View {
         alignment: .leading,
         spacing: 2
       ) {
-        Text("USB Touchpad")
+        Text("Touchpad")
           .font(.headline)
 
         Text(appState.statusText)

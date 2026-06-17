@@ -17,9 +17,9 @@ fi
 
 cd "$MACOS_DIR"
 
-echo "Building macOS application..."
+echo "Building Touchpad for macOS..."
 swift build
 
 echo
-echo "Starting macOS application..."
-swift run USBTouchpadMac
+echo "Starting Touchpad..."
+swift run Touchpad

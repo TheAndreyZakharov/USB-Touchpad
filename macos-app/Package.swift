@@ -3,13 +3,13 @@
 import PackageDescription
 
 let package = Package(
-  name: "USBTouchpadMac",
+  name: "Touchpad",
   platforms: [
     .macOS(.v13)
   ],
   products: [
     .executable(
-      name: "USBTouchpadMac",
+      name: "Touchpad",
       targets: ["USBTouchpadMac"]
     )
   ],

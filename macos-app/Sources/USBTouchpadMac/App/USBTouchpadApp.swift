@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 
 @main
-struct USBTouchpadApp: App {
+struct TouchpadApp: App {
   @StateObject private var appState = AppState()
 
   init() {
@@ -19,7 +19,7 @@ struct USBTouchpadApp: App {
           ? "rectangle.connected.to.line.below"
           : "rectangle.dashed"
       )
-      .accessibilityLabel("USB Touchpad")
+      .accessibilityLabel("Touchpad")
     }
     .menuBarExtraStyle(.window)
   }

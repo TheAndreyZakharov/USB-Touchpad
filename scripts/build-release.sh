@@ -9,12 +9,12 @@ MACOS_DIR="$ROOT_DIR/macos-app"
 ASSETS_DIR="$ROOT_DIR/assets"
 
 RELEASE_DIR="$ROOT_DIR/release"
-APP_NAME="USB Touchpad"
+APP_NAME="Touchpad"
 APP_BUNDLE="$RELEASE_DIR/$APP_NAME.app"
 
 VERSION="${1:-1.0.0}"
 
-echo "Building USB Touchpad release $VERSION"
+echo "Building Touchpad release $VERSION"
 echo
 
 rm -rf "$RELEASE_DIR"
@@ -38,42 +38,38 @@ fi
 
 cp \
     "$ANDROID_APK" \
-    "$RELEASE_DIR/USB-Touchpad-Android-$VERSION.apk"
+    "$RELEASE_DIR/Touchpad-Android-$VERSION.apk"
 
 echo "Android APK created."
 
 # ------------------------------------------------------------
-# macOS binary
+# macOS
 # ------------------------------------------------------------
 
 echo
 echo "Building macOS application..."
 
 cd "$MACOS_DIR"
-swift build -c release
+swift build -c release --product Touchpad
 
-MACOS_BINARY="$MACOS_DIR/.build/release/USBTouchpadMac"
+MACOS_BINARY="$MACOS_DIR/.build/release/Touchpad"
 
 if [ ! -f "$MACOS_BINARY" ]; then
     echo "macOS executable was not created."
     exit 1
 fi
 
-# ------------------------------------------------------------
-# macOS bundle structure
-# ------------------------------------------------------------
-
 mkdir -p "$APP_BUNDLE/Contents/MacOS"
 mkdir -p "$APP_BUNDLE/Contents/Resources"
 
 cp \
     "$MACOS_BINARY" \
-    "$APP_BUNDLE/Contents/MacOS/USBTouchpadMac"
+    "$APP_BUNDLE/Contents/MacOS/Touchpad"
 
-chmod +x "$APP_BUNDLE/Contents/MacOS/USBTouchpadMac"
+chmod +x "$APP_BUNDLE/Contents/MacOS/Touchpad"
 
 # ------------------------------------------------------------
-# Copy Swift Package resource bundles
+# Swift Package resources
 # ------------------------------------------------------------
 
 find "$MACOS_DIR/.build/release" \
@@ -82,7 +78,6 @@ find "$MACOS_DIR/.build/release" \
     -name "*.bundle" \
     -exec cp -R {} "$APP_BUNDLE/Contents/Resources/" \;
 
-# Also include the source icon as a fallback resource.
 if [ -f "$ASSETS_DIR/app-icon.png" ]; then
     cp \
         "$ASSETS_DIR/app-icon.png" \
@@ -174,10 +169,10 @@ cat > "$APP_BUNDLE/Contents/Info.plist" <<EOF
     <string>en</string>
 
     <key>CFBundleDisplayName</key>
-    <string>USB Touchpad</string>
+    <string>Touchpad</string>
 
     <key>CFBundleExecutable</key>
-    <string>USBTouchpadMac</string>
+    <string>Touchpad</string>
 
     <key>CFBundleIconFile</key>
     <string>AppIcon</string>
@@ -189,7 +184,7 @@ cat > "$APP_BUNDLE/Contents/Info.plist" <<EOF
     <string>6.0</string>
 
     <key>CFBundleName</key>
-    <string>USB Touchpad</string>
+    <string>Touchpad</string>
 
     <key>CFBundlePackageType</key>
     <string>APPL</string>
@@ -213,7 +208,7 @@ cat > "$APP_BUNDLE/Contents/Info.plist" <<EOF
 EOF
 
 # ------------------------------------------------------------
-# Ad-hoc signing
+# Signing
 # ------------------------------------------------------------
 
 echo "Signing macOS application..."
@@ -231,7 +226,7 @@ codesign \
     "$APP_BUNDLE"
 
 # ------------------------------------------------------------
-# ZIP
+# Archive
 # ------------------------------------------------------------
 
 echo "Creating macOS ZIP..."
@@ -244,12 +239,12 @@ ditto \
     --sequesterRsrc \
     --keepParent \
     "$APP_NAME.app" \
-    "USB-Touchpad-macOS-$VERSION.zip"
+    "Touchpad-macOS-$VERSION.zip"
 
-# Remove unpacked app from release output.
 rm -rf "$APP_BUNDLE"
 
 echo
 echo "Release files created:"
 echo
+
 ls -lh "$RELEASE_DIR"
