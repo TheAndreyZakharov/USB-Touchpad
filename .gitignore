@@ -1,0 +1,20 @@
+
+# Android
+android-app/local.properties
+android-app/.gradle/
+android-app/**/build/
+*.apk
+*.aab
+
+# Swift Package Manager
+macos-app/.build/
+macos-app/.swiftpm/
+
+# Xcode
+DerivedData/
+*.xcuserstate
+xcuserdata/
+
+# macOS
+.DS_Store
+
