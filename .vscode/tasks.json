@@ -1,0 +1,71 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Check environment",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/check-environment.sh",
+      "problemMatcher": []
+    },
+    {
+      "label": "Android: Build debug APK",
+      "type": "shell",
+      "command": "./gradlew assembleDebug",
+      "options": {
+        "cwd": "${workspaceFolder}/android-app"
+      },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Android: Install debug APK",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/install-android.sh",
+      "problemMatcher": []
+    },
+    {
+      "label": "macOS: Build",
+      "type": "shell",
+      "command": "swift build",
+      "options": {
+        "cwd": "${workspaceFolder}/macos-app"
+      },
+      "group": "build",
+      "problemMatcher": [
+        "$swiftc"
+      ]
+    },
+    {
+      "label": "macOS: Run",
+      "type": "shell",
+      "command": "${workspaceFolder}/scripts/run-macos.sh",
+      "problemMatcher": [
+        "$swiftc"
+      ]
+    },
+    {
+      "label": "macOS: Test",
+      "type": "shell",
+      "command": "swift test",
+      "options": {
+        "cwd": "${workspaceFolder}/macos-app"
+      },
+      "group": "test",
+      "problemMatcher": [
+        "$swiftc"
+      ]
+    },
+    {
+      "label": "ADB: List devices",
+      "type": "shell",
+      "command": "adb devices -l",
+      "problemMatcher": []
+    },
+    {
+      "label": "ADB: Forward touchpad port",
+      "type": "shell",
+      "command": "adb forward tcp:27183 tcp:27183",
+      "problemMatcher": []
+    }
+  ]
+}

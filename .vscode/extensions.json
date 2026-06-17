@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "swiftlang.swift-vscode",
+    "llvm-vs-code-extensions.lldb-dap",
+    "vscjava.vscode-java-pack",
+    "richardwillis.vscode-gradle-extension-pack"
+  ]
+}
