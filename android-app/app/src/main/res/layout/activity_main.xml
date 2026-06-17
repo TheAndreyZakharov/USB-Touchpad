@@ -49,27 +49,43 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|left"
         android:layout_margin="18dp"
-        android:orientation="vertical">
+        android:background="@drawable/status_panel_background"
+        android:orientation="vertical"
+        android:padding="12dp">
 
         <TextView
             style="@style/InstructionText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/instruction_one_finger" />
+            android:text="@string/instruction_move" />
 
         <TextView
             style="@style/InstructionText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="@string/instruction_tap" />
+            android:text="@string/instruction_left_click" />
 
         <TextView
             style="@style/InstructionText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="@string/instruction_two_fingers" />
+            android:text="@string/instruction_right_click" />
+
+        <TextView
+            style="@style/InstructionText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/instruction_scroll" />
+
+        <TextView
+            style="@style/InstructionText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/instruction_drag" />
 
     </LinearLayout>
 

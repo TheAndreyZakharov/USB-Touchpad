@@ -63,7 +63,6 @@ public final class TouchServer {
         }
 
         updateScreenSize(width, height);
-
         running = true;
 
         serverThread = new Thread(
@@ -100,7 +99,6 @@ public final class TouchServer {
         Log.d(TAG, "Stopping server");
 
         running = false;
-
         closeClient();
 
         if (serverSocket != null) {
@@ -154,14 +152,34 @@ public final class TouchServer {
                         dy));
     }
 
+    public void sendDragStart() {
+        sendLine(
+                TouchMessage.dragStart(
+                        nextSequence()));
+    }
+
+    public void sendDragMove(
+            float dx,
+            float dy) {
+        sendLine(
+                TouchMessage.dragMove(
+                        nextSequence(),
+                        dx,
+                        dy));
+    }
+
+    public void sendDragEnd() {
+        sendLine(
+                TouchMessage.dragEnd(
+                        nextSequence()));
+    }
+
     private void runServer() {
         try {
             ServerSocket socket = new ServerSocket();
 
             socket.setReuseAddress(true);
-
-            socket.bind(
-                    new InetSocketAddress(PORT));
+            socket.bind(new InetSocketAddress(PORT));
 
             serverSocket = socket;
 

@@ -83,10 +83,6 @@ public final class MainActivity
 
         Log.i(TAG, "Screen orientation changed");
 
-        /*
-         * После поворота нужно дождаться, пока Android
-         * пересчитает размеры TouchpadView.
-         */
         touchpadView.post(
                 new Runnable() {
                     @Override
@@ -182,6 +178,29 @@ public final class MainActivity
             float dy) {
         if (touchServer != null) {
             touchServer.sendScroll(dx, dy);
+        }
+    }
+
+    @Override
+    public void onDragStart() {
+        if (touchServer != null) {
+            touchServer.sendDragStart();
+        }
+    }
+
+    @Override
+    public void onDragMove(
+            float dx,
+            float dy) {
+        if (touchServer != null) {
+            touchServer.sendDragMove(dx, dy);
+        }
+    }
+
+    @Override
+    public void onDragEnd() {
+        if (touchServer != null) {
+            touchServer.sendDragEnd();
         }
     }
 

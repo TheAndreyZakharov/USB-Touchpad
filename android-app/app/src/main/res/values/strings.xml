@@ -8,11 +8,11 @@
     <string name="status_connected">Connected to Mac</string>
     <string name="status_disconnected">Mac disconnected</string>
     <string name="status_error">Connection error</string>
-
-    <string name="instruction_one_finger">Move one finger to control the pointer</string>
-    <string name="instruction_tap">Tap to perform a left click</string>
-    <string name="instruction_two_fingers">Move two fingers to scroll</string>
-
-    <string name="connection_title">USB connection</string>
     <string name="touchpad_ready">Touchpad ready</string>
+
+    <string name="instruction_move">One finger: move pointer</string>
+    <string name="instruction_left_click">One-finger tap: left click</string>
+    <string name="instruction_right_click">Two-finger tap: right click</string>
+    <string name="instruction_scroll">Move two fingers: scroll</string>
+    <string name="instruction_drag">Double tap and drag: hold left button</string>
 </resources>

@@ -21,9 +21,18 @@ public final class TouchpadView extends View {
         void onScroll(
                 float dx,
                 float dy);
+
+        void onDragStart();
+
+        void onDragMove(
+                float dx,
+                float dy);
+
+        void onDragEnd();
     }
 
     private static final long TAP_TIMEOUT_MILLISECONDS = 250L;
+    private static final long DOUBLE_TAP_TIMEOUT_MILLISECONDS = 350L;
 
     private Listener listener;
 
@@ -34,8 +43,14 @@ public final class TouchpadView extends View {
 
     private long downTime;
 
+    private long lastTapTime;
+    private float lastTapX;
+    private float lastTapY;
+
     private boolean multiTouchUsed;
     private boolean scrolling;
+    private boolean doubleTapCandidate;
+    private boolean dragging;
 
     public TouchpadView(Context context) {
         super(context);
@@ -103,7 +118,7 @@ public final class TouchpadView extends View {
                 return true;
 
             case MotionEvent.ACTION_CANCEL:
-                resetGesture();
+                cancelGesture();
                 return true;
 
             default:
@@ -120,6 +135,17 @@ public final class TouchpadView extends View {
 
         multiTouchUsed = false;
         scrolling = false;
+        dragging = false;
+
+        long timeSinceLastTap = event.getEventTime() - lastTapTime;
+
+        float distanceFromLastTap = calculateDistance(
+                event.getX(0) - lastTapX,
+                event.getY(0) - lastTapY);
+
+        doubleTapCandidate = lastTapTime > 0L
+                && timeSinceLastTap <= DOUBLE_TAP_TIMEOUT_MILLISECONDS
+                && distanceFromLastTap <= touchSlop * 3.0f;
     }
 
     private void beginMultiTouch(MotionEvent event) {
@@ -127,6 +153,12 @@ public final class TouchpadView extends View {
             return;
         }
 
+        if (dragging && listener != null) {
+            listener.onDragEnd();
+        }
+
+        dragging = false;
+        doubleTapCandidate = false;
         multiTouchUsed = true;
         scrolling = true;
 
@@ -155,6 +187,26 @@ public final class TouchpadView extends View {
         totalMovement += calculateDistance(
                 dx,
                 dy);
+
+        if (doubleTapCandidate) {
+            if (!dragging && totalMovement > touchSlop) {
+                dragging = true;
+
+                if (listener != null) {
+                    listener.onDragStart();
+                }
+            }
+
+            if (dragging
+                    && listener != null
+                    && (dx != 0.0f || dy != 0.0f)) {
+                listener.onDragMove(
+                        dx,
+                        dy);
+            }
+
+            return;
+        }
 
         if (listener != null
                 && (dx != 0.0f || dy != 0.0f)) {
@@ -189,6 +241,7 @@ public final class TouchpadView extends View {
     private void finishPointer(MotionEvent event) {
         multiTouchUsed = true;
         scrolling = false;
+        doubleTapCandidate = false;
 
         int removedIndex = event.getActionIndex();
         int remainingIndex = removedIndex == 0
@@ -205,6 +258,16 @@ public final class TouchpadView extends View {
     }
 
     private void finishGesture(MotionEvent event) {
+        if (dragging) {
+            if (listener != null) {
+                listener.onDragEnd();
+            }
+
+            lastTapTime = 0L;
+            resetCurrentGesture();
+            return;
+        }
+
         long duration = event.getEventTime() - downTime;
 
         boolean tap = duration <= TAP_TIMEOUT_MILLISECONDS
@@ -213,14 +276,30 @@ public final class TouchpadView extends View {
         if (tap && listener != null) {
             if (multiTouchUsed) {
                 listener.onRightTap();
+                lastTapTime = 0L;
             } else {
                 listener.onTap();
+
+                lastTapTime = event.getEventTime();
+                lastTapX = event.getX(0);
+                lastTapY = event.getY(0);
             }
 
             performClick();
+        } else if (doubleTapCandidate) {
+            lastTapTime = 0L;
         }
 
-        resetGesture();
+        resetCurrentGesture();
+    }
+
+    private void cancelGesture() {
+        if (dragging && listener != null) {
+            listener.onDragEnd();
+        }
+
+        lastTapTime = 0L;
+        resetCurrentGesture();
     }
 
     @Override
@@ -229,13 +308,16 @@ public final class TouchpadView extends View {
         return true;
     }
 
-    private void resetGesture() {
+    private void resetCurrentGesture() {
         previousX = 0.0f;
         previousY = 0.0f;
         totalMovement = 0.0f;
         downTime = 0L;
+
         multiTouchUsed = false;
         scrolling = false;
+        doubleTapCandidate = false;
+        dragging = false;
     }
 
     private static float centroidX(MotionEvent event) {

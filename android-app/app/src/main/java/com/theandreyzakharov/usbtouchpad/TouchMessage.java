@@ -58,6 +58,17 @@ public final class TouchMessage {
                 dy);
     }
 
+    public static String dragMove(
+            long sequence,
+            float dx,
+            float dy) {
+        return createMovementMessage(
+                "dragMove",
+                sequence,
+                dx,
+                dy);
+    }
+
     public static String tap(long sequence) {
         return createBaseMessage(
                 "tap",
@@ -67,6 +78,18 @@ public final class TouchMessage {
     public static String rightTap(long sequence) {
         return createBaseMessage(
                 "rightTap",
+                sequence).toString();
+    }
+
+    public static String dragStart(long sequence) {
+        return createBaseMessage(
+                "dragStart",
+                sequence).toString();
+    }
+
+    public static String dragEnd(long sequence) {
+        return createBaseMessage(
+                "dragEnd",
                 sequence).toString();
     }
 
